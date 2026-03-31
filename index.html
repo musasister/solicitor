@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>법인등기 실무 업무매뉴얼</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #f0f2f5; color: #333; }
+
+.header { background: linear-gradient(135deg, #1a365d, #2b6cb0); color: #fff; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.header h1 { font-size: 1.4em; margin-bottom: 4px; }
+.header p { font-size: 0.85em; opacity: 0.85; }
+
+.tabs { display: flex; background: #fff; border-bottom: 2px solid #e2e8f0; position: sticky; top: 68px; z-index: 99; }
+.tab-btn { flex: 1; padding: 14px 10px; text-align: center; font-size: 1em; font-weight: 600; border: none; background: none; cursor: pointer; color: #718096; transition: all 0.2s; border-bottom: 3px solid transparent; }
+.tab-btn.active { color: #2b6cb0; border-bottom-color: #2b6cb0; background: #ebf4ff; }
+.tab-btn:hover { background: #f7fafc; }
+
+.tab-content { display: none; padding: 15px; max-width: 800px; margin: 0 auto; }
+.tab-content.active { display: block; }
+
+.card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.card h3 { font-size: 1.05em; color: #1a365d; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.92em; color: #4a5568; }
+.form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: 1em; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
+.form-group .hint { font-size: 0.82em; color: #999; margin-top: 3px; }
+
+.checkbox-group { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
+.checkbox-group input[type="checkbox"] { width: 20px; height: 20px; accent-color: #2b6cb0; }
+.checkbox-group label { font-weight: 500; margin-bottom: 0; cursor: pointer; }
+
+.btn { display: inline-block; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #2b6cb0; color: #fff; width: 100%; }
+.btn-primary:hover { background: #1a4f8b; }
+.btn-secondary { background: #e2e8f0; color: #4a5568; }
+.btn-secondary:hover { background: #cbd5e0; }
+.btn-group { display: flex; gap: 8px; margin-top: 10px; }
+.btn-group .btn { flex: 1; text-align: center; padding: 10px; font-size: 0.9em; }
+
+.result-box { background: #f7fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-top: 15px; }
+.result-row { display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px solid #edf2f7; font-size: 0.95em; }
+.result-row:last-child { border-bottom: none; }
+.result-row.total { font-weight: 700; font-size: 1.15em; color: #1a365d; background: #ebf4ff; border-radius: 8px; padding: 12px 10px; margin-top: 5px; border-bottom: none; }
+.result-row .label { color: #4a5568; }
+.result-row .amount { font-weight: 600; }
+
+.doc-item { padding: 12px; border-bottom: 1px solid #edf2f7; display: flex; align-items: flex-start; gap: 10px; }
+.doc-item:last-child { border-bottom: none; }
+.doc-item input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: #38a169; flex-shrink: 0; }
+.doc-info { flex: 1; }
+.doc-name { font-weight: 600; font-size: 0.95em; }
+.doc-desc { font-size: 0.82em; color: #718096; margin-top: 3px; line-height: 1.4; }
+
+.progress-bar { background: #e2e8f0; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #38a169, #48bb78); border-radius: 10px; transition: width 0.3s; }
+.progress-text { text-align: right; font-size: 0.85em; color: #38a169; font-weight: 600; }
+
+.estimate-preview { white-space: pre-wrap; font-family: 'D2Coding', monospace, 'Courier New'; font-size: 0.85em; line-height: 1.6; background: #1a202c; color: #e2e8f0; padding: 20px; border-radius: 10px; overflow-x: auto; }
+
+.footer { text-align: center; padding: 20px; font-size: 0.8em; color: #a0aec0; }
+
+.hidden { display: none !important; }
+
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.15em; }
+  .tab-btn { font-size: 0.88em; padding: 12px 6px; }
+  .card { padding: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>법인등기 실무 업무매뉴얼</h1>
+  <p>견적서 작성 · 필요서류 안내</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('estimate')">견적서 작성</button>
+  <button class="tab-btn" onclick="switchTab('documents')">필요서류 안내</button>
+</div>
+
+<!-- ========== 견적서 작성 탭 ========== -->
+<div id="tab-estimate" class="tab-content active">
+  <div class="card">
+    <h3>견적 정보 입력</h3>
+    <div class="form-group">
+      <label>의뢰인 (고객명)</label>
+      <input type="text" id="clientName" placeholder="홍길동">
+    </div>
+    <div class="form-group">
+      <label>법인명</label>
+      <input type="text" id="corpName" placeholder="주식회사 OO">
+    </div>
+    <div class="form-group">
+      <label>등기 유형</label>
+      <select id="regType" onchange="onRegTypeChange()">
+        <option value="">-- 선택하세요 --</option>
+      </select>
+    </div>
+    <div class="form-group" id="capitalGroup">
+      <label>자본금 / 증자액 (원)</label>
+      <input type="text" id="capitalAmount" placeholder="100,000,000" oninput="formatNumber(this)">
+      <div class="hint">숫자만 입력하세요 (자동 콤마 표시)</div>
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="isMetro">
+      <label for="isMetro">수도권과밀억제권역 (서울·과천·성남·고양 등)</label>
+    </div>
+    <div class="form-group">
+      <label>법무사 보수 직접입력 (원) <span style="font-weight:400;color:#999">- 비워두면 기본값</span></label>
+      <input type="text" id="customFee" placeholder="직접 입력 시 금액 입력" oninput="formatNumber(this)">
+    </div>
+    <button class="btn btn-primary" onclick="calculateEstimate()">견적서 계산</button>
+  </div>
+
+  <div id="resultCard" class="card hidden">
+    <h3>비용 명세</h3>
+    <div class="result-box" id="resultBox"></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="copyEstimate()">복사</button>
+      <button class="btn btn-secondary" onclick="downloadEstimate()">저장</button>
+      <button class="btn btn-secondary" onclick="resetEstimate()">초기화</button>
+    </div>
+  </div>
+
+  <div id="previewCard" class="card hidden">
+    <h3>견적서 미리보기</h3>
+    <div class="estimate-preview" id="previewBox"></div>
+  </div>
+</div>
+
+<!-- ========== 필요서류 안내 탭 ========== -->
+<div id="tab-documents" class="tab-content">
+  <div class="card">
+    <h3>등기 유형 선택</h3>
+    <div class="form-group">
+      <select id="docRegType" onchange="onDocTypeChange()">
+        <option value="">-- 등기 유형을 선택하세요 --</option>
+      </select>
+    </div>
+    <div id="progressArea" class="hidden">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-text" id="progressText">준비 완료: 0/0</div>
+    </div>
+  </div>
+
+  <div id="docListCard" class="card hidden">
+    <h3 id="docListTitle">필요서류 목록</h3>
+    <div id="docList"></div>
+  </div>
+</div>
+
+<div class="footer">
+  법인등기 실무 업무매뉴얼 v1.0 | 수수료는 참고용이며 관할 법원/지자체에 따라 다를 수 있습니다.
+</div>
+
+<script>
+// ===== 데이터 =====
+const REGISTRATION_TYPES = [
+  "설립등기","임원변경등기","본점이전등기 (관할내)","본점이전등기 (관할외)",
+  "유상증자등기","무상증자등기","감자등기","목적변경등기","상호변경등기",
+  "합병등기","분할등기","해산등기","청산종결등기"
+];
+
+const CAPITAL_BASED = ["설립등기","유상증자등기","무상증자등기","합병등기"];
+
+const FEE_TABLE = {
+  "설립등기": { rate:0.004, min:112500, metro:3, eduRate:0.2, court:2000, courtCnt:1, scrivener:500000 },
+  "임원변경등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:300000 },
+  "본점이전등기 (관할내)": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:300000 },
+  "본점이전등기 (관할외)": { fixed:40200, fixedCnt:2, eduRate:0.2, court:2000, courtCnt:2, scrivener:400000 },
+  "유상증자등기": { rate:0.004, min:112500, metro:3, eduRate:0.2, court:2000, courtCnt:1, scrivener:400000 },
+  "무상증자등기": { rate:0.004, min:112500, metro:3, eduRate:0.2, court:2000, courtCnt:1, scrivener:350000 },
+  "감자등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:400000 },
+  "목적변경등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:250000 },
+  "상호변경등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:250000 },
+  "합병등기": { rate:0.004, min:112500, metro:3, eduRate:0.2, court:2000, courtCnt:1, scrivener:800000 },
+  "분할등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:800000 },
+  "해산등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:300000 },
+  "청산종결등기": { fixed:40200, eduRate:0.2, court:2000, courtCnt:1, scrivener:250000 }
+};
+
+const REQUIRED_DOCS = {
+  "설립등기": [
+    ["정관","공증받은 원본 (자본금 10억 미만 소규모회사는 공증 면제 가능)"],
+    ["발기인회의사록 (또는 창립총회의사록)","발기인 전원 인감날인, 모집설립 시 창립총회의사록"],
+    ["발기인 전원의 인감증명서","3개월 이내 발급본"],
+    ["주식인수증","발기인별 주식인수 내역 기재"],
+    ["주금납입보관증명서","은행 발행 (잔고증명서로 대체 가능한 경우 있음)"],
+    ["대표이사, 이사, 감사 취임승낙서","각 임원별 인감날인"],
+    ["대표이사 인감증명서","취임 시 법인인감신고용, 3개월 이내"],
+    ["임원 주민등록등·초본","주소 확인용"],
+    ["등기위임장","법무사 위임 시 필요"],
+    ["법인인감신고서","법원 제출용"],
+    ["주주명부","설립 시 주주 현황"]
+  ],
+  "임원변경등기": [
+    ["주주총회의사록","공증 필요 (자본금 10억 미만 소규모회사 면제 가능), 의장 및 출석이사 인감날인"],
+    ["이사회의사록","대표이사 선임/변경 시 필요"],
+    ["취임승낙서","신규 임원의 인감날인"],
+    ["사임서","사임하는 임원의 인감날인 (또는 서명)"],
+    ["신규 임원 인감증명서","3개월 이내 발급본"],
+    ["신규 임원 주민등록등·초본","주소 확인용"],
+    ["주주명부","의결정족수 확인용"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인인감신고서","대표이사 변경 시"],
+    ["법인등기사항전부증명서","현재 등기 현황 확인용"]
+  ],
+  "본점이전등기 (관할내)": [
+    ["주주총회의사록","정관에 본점 소재지 변경 시 (시·도 단위 변경 시 특별결의)"],
+    ["이사회의사록","구체적 이전 장소 결정"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 등기 현황 확인"],
+    ["임대차계약서 사본","새 본점 주소 확인용 (참고자료)"]
+  ],
+  "본점이전등기 (관할외)": [
+    ["주주총회의사록","정관변경 특별결의 (시·도 단위 변경 시)"],
+    ["이사회의사록","구체적 이전 장소 결정"],
+    ["등기위임장","법무사 위임 시 (전출·전입 각각)"],
+    ["법인등기사항전부증명서","현재 등기 현황 확인"],
+    ["법인인감신고서","전입 관할 법원에 새로 신고"],
+    ["법인인감카드","전출 관할 법원 반납 후 재발급"],
+    ["임대차계약서 사본","새 본점 주소 확인용 (참고자료)"]
+  ],
+  "유상증자등기": [
+    ["주주총회의사록","신주발행 결의 (이사회 결의로 가능한 경우 이사회의사록)"],
+    ["이사회의사록","신주발행사항 결정"],
+    ["신주인수증","인수인별 인수 내역"],
+    ["주금납입증명서","은행 발행 또는 잔고증명서"],
+    ["주주명부","증자 후 주주 현황"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 자본금 확인"],
+    ["배정통지서/실권주처리 관련 서류","제3자 배정 시 필요"]
+  ],
+  "무상증자등기": [
+    ["주주총회의사록","무상증자(준비금의 자본전입) 결의"],
+    ["이사회의사록","신주배정 기준일 등 결정"],
+    ["주주명부","배정 기준 주주 현황"],
+    ["재무제표","자본준비금/이익준비금 확인"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 자본금 확인"]
+  ],
+  "감자등기": [
+    ["주주총회의사록","감자 특별결의 (출석주주 의결권의 2/3, 발행주식총수의 1/3)"],
+    ["이사회의사록","감자 세부사항 결정"],
+    ["채권자 이의제출 공고 및 최고 증빙","관보공고 + 개별최고 (1개월 이상)"],
+    ["주권제출 공고 증빙","주권발행회사의 경우"],
+    ["주주명부","감자 전후 주주 현황"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 자본금 확인"]
+  ],
+  "목적변경등기": [
+    ["주주총회의사록","정관변경 특별결의 (목적 추가/변경/삭제)"],
+    ["변경 후 정관 사본","변경된 목적 조항 확인"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 목적 확인"]
+  ],
+  "상호변경등기": [
+    ["주주총회의사록","정관변경 특별결의 (상호 변경)"],
+    ["변경 후 정관 사본","변경된 상호 확인"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인인감신고서","상호 변경에 따른 인감 재신고"],
+    ["법인등기사항전부증명서","현재 상호 확인"]
+  ],
+  "합병등기": [
+    ["합병계약서","합병 당사회사 간 체결"],
+    ["주주총회의사록 (각 회사)","합병승인 특별결의"],
+    ["이사회의사록 (각 회사)","합병계약 승인"],
+    ["합병대차대조표","합병 기일 기준"],
+    ["채권자 이의제출 공고 및 최고 증빙","관보공고 + 개별최고 (1개월 이상)"],
+    ["주권제출 공고 증빙","주권발행회사의 경우"],
+    ["주금납입증명서","합병신주 발행 시"],
+    ["존속회사 정관","합병 후 정관"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서 (각 회사)","합병 전 현황 확인"]
+  ],
+  "분할등기": [
+    ["분할계획서","분할 방법, 신설회사 내용 등"],
+    ["주주총회의사록","분할승인 특별결의"],
+    ["이사회의사록","분할 세부사항 결정"],
+    ["분할대차대조표","분할 기일 기준"],
+    ["채권자 이의제출 공고 및 최고 증빙","관보공고 + 개별최고 (1개월 이상)"],
+    ["신설회사 정관","분할신설회사의 정관"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","분할 전 현황 확인"]
+  ],
+  "해산등기": [
+    ["주주총회의사록","해산결의 특별결의"],
+    ["청산인 취임승낙서","청산인 인감날인"],
+    ["청산인 인감증명서","3개월 이내"],
+    ["청산인 주민등록등본","주소 확인용"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","현재 등기 현황 확인"],
+    ["법인인감신고서","청산인 인감신고"]
+  ],
+  "청산종결등기": [
+    ["청산종결 주주총회의사록","결산보고서 승인"],
+    ["결산보고서","청산 재산 처분 내역"],
+    ["청산인 인감증명서","3개월 이내"],
+    ["등기위임장","법무사 위임 시"],
+    ["법인등기사항전부증명서","해산등기 후 현황 확인"],
+    ["세무서 폐업신고 확인서","관할 세무서 발급 (참고)"]
+  ]
+};
+
+// ===== 초기화 =====
+function init() {
+  const sel1 = document.getElementById('regType');
+  const sel2 = document.getElementById('docRegType');
+  REGISTRATION_TYPES.forEach(t => {
+    sel1.innerHTML += `<option value="${t}">${t}</option>`;
+    sel2.innerHTML += `<option value="${t}">${t}</option>`;
+  });
+  onRegTypeChange();
+}
+
+// ===== 탭 전환 =====
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (name==='estimate' && i===0) || (name==='documents' && i===1));
+  });
+  document.getElementById('tab-estimate').classList.toggle('active', name==='estimate');
+  document.getElementById('tab-documents').classList.toggle('active', name==='documents');
+}
+
+// ===== 숫자 포맷 =====
+function formatNumber(el) {
+  let v = el.value.replace(/[^0-9]/g,'');
+  if(v) el.value = parseInt(v).toLocaleString('ko-KR');
+  else el.value = '';
+}
+function parseNum(s) {
+  if(!s) return 0;
+  return parseInt(s.replace(/[^0-9]/g,'')) || 0;
+}
+function formatWon(n) { return n.toLocaleString('ko-KR') + '원'; }
+
+// ===== 견적서 탭 =====
+function onRegTypeChange() {
+  const t = document.getElementById('regType').value;
+  const cg = document.getElementById('capitalGroup');
+  cg.classList.toggle('hidden', !CAPITAL_BASED.includes(t));
+  if(!CAPITAL_BASED.includes(t)) document.getElementById('capitalAmount').value = '';
+}
+
+function calculateEstimate() {
+  const regType = document.getElementById('regType').value;
+  if(!regType) { alert('등기 유형을 선택해주세요.'); return; }
+
+  const capital = parseNum(document.getElementById('capitalAmount').value);
+  const isMetro = document.getElementById('isMetro').checked;
+  const customFee = parseNum(document.getElementById('customFee').value);
+  const fee = FEE_TABLE[regType];
+
+  // 등록면허세
+  let regTax = 0;
+  if(fee.rate !== undefined) {
+    regTax = Math.floor(capital * fee.rate);
+    if(regTax < fee.min) regTax = fee.min;
+    if(isMetro) regTax = Math.floor(regTax * fee.metro);
+  } else {
+    regTax = fee.fixed * (fee.fixedCnt || 1);
+  }
+
+  // 지방교육세
+  const eduTax = Math.floor(regTax * fee.eduRate);
+
+  // 등기신청수수료
+  const courtFee = fee.court * fee.courtCnt;
+
+  // 법무사 보수
+  const scrivener = customFee > 0 ? customFee : fee.scrivener;
+
+  // 합계
+  const total = regTax + eduTax + courtFee + scrivener;
+
+  // 결과 표시
+  const resultBox = document.getElementById('resultBox');
+  resultBox.innerHTML = `
+    <div class="result-row"><span class="label">등록면허세</span><span class="amount">${formatWon(regTax)}</span></div>
+    <div class="result-row"><span class="label">지방교육세</span><span class="amount">${formatWon(eduTax)}</span></div>
+    <div class="result-row"><span class="label">등기신청수수료</span><span class="amount">${formatWon(courtFee)}</span></div>
+    <div class="result-row"><span class="label">법무사 보수</span><span class="amount">${formatWon(scrivener)}</span></div>
+    <div class="result-row total"><span class="label">합 계</span><span class="amount">${formatWon(total)}</span></div>
+  `;
+  document.getElementById('resultCard').classList.remove('hidden');
+
+  // 미리보기
+  const client = document.getElementById('clientName').value || '(미입력)';
+  const corp = document.getElementById('corpName').value || '(미입력)';
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+  const metroText = isMetro ? '수도권과밀억제권역' : '일반지역';
+
+  let preview = '';
+  preview += '══════════════════════════════════════════════════\n';
+  preview += '              법인등기 견적서\n';
+  preview += '══════════════════════════════════════════════════\n\n';
+  preview += `  작성일자: ${dateStr}\n`;
+  preview += `  의뢰인:   ${client}\n`;
+  preview += `  법인명:   ${corp}\n\n`;
+  preview += '──────────────────────────────────────────────────\n';
+  preview += `  등기 유형: ${regType}\n`;
+  if(capital > 0) preview += `  자본금/증자액: ${formatWon(capital)}\n`;
+  preview += `  지역 구분: ${metroText}\n`;
+  preview += '──────────────────────────────────────────────────\n\n';
+  preview += '  [ 비용 내역 ]\n\n';
+  preview += `    등록면허세            ${formatWon(regTax).padStart(15)}\n`;
+  preview += `    지방교육세            ${formatWon(eduTax).padStart(15)}\n`;
+  preview += `    등기신청수수료        ${formatWon(courtFee).padStart(15)}\n`;
+  preview += `    법무사 보수           ${formatWon(scrivener).padStart(15)}\n\n`;
+  preview += '  ──────────────────────────────────────────────\n';
+  preview += `    합계                  ${formatWon(total).padStart(15)}\n`;
+  preview += '  ──────────────────────────────────────────────\n\n';
+  preview += '  ※ 본 견적서는 참고용이며, 실제 비용은 다를 수 있습니다.\n';
+  preview += '  ※ 등록면허세 및 교육세는 관할 지자체에 따라 변동될 수 있습니다.\n';
+  preview += '  ※ 법무사 보수는 사건의 난이도에 따라 협의 가능합니다.\n\n';
+  preview += '══════════════════════════════════════════════════';
+
+  document.getElementById('previewBox').textContent = preview;
+  document.getElementById('previewCard').classList.remove('hidden');
+
+  window._lastEstimate = preview;
+}
+
+function copyEstimate() {
+  if(!window._lastEstimate) { alert('먼저 견적서를 계산해주세요.'); return; }
+  navigator.clipboard.writeText(window._lastEstimate).then(() => alert('견적서가 클립보드에 복사되었습니다.'));
+}
+
+function downloadEstimate() {
+  if(!window._lastEstimate) { alert('먼저 견적서를 계산해주세요.'); return; }
+  const blob = new Blob([window._lastEstimate], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const today = new Date();
+  a.download = `견적서_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.txt`;
+  a.click();
+}
+
+function resetEstimate() {
+  document.getElementById('clientName').value = '';
+  document.getElementById('corpName').value = '';
+  document.getElementById('regType').value = '';
+  document.getElementById('capitalAmount').value = '';
+  document.getElementById('isMetro').checked = false;
+  document.getElementById('customFee').value = '';
+  document.getElementById('resultCard').classList.add('hidden');
+  document.getElementById('previewCard').classList.add('hidden');
+  onRegTypeChange();
+  window._lastEstimate = null;
+}
+
+// ===== 필요서류 탭 =====
+function onDocTypeChange() {
+  const t = document.getElementById('docRegType').value;
+  const docs = REQUIRED_DOCS[t];
+  const listCard = document.getElementById('docListCard');
+  const progArea = document.getElementById('progressArea');
+
+  if(!t || !docs) {
+    listCard.classList.add('hidden');
+    progArea.classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('docListTitle').textContent = `${t} - 필요서류 (${docs.length}건)`;
+
+  let html = '';
+  docs.forEach((d, i) => {
+    html += `<div class="doc-item">
+      <input type="checkbox" id="doc${i}" onchange="updateProgress()">
+      <div class="doc-info">
+        <div class="doc-name">${i+1}. ${d[0]}</div>
+        <div class="doc-desc">→ ${d[1]}</div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('docList').innerHTML = html;
+  listCard.classList.remove('hidden');
+  progArea.classList.remove('hidden');
+  updateProgress();
+}
+
+function updateProgress() {
+  const checks = document.querySelectorAll('#docList input[type="checkbox"]');
+  const total = checks.length;
+  const checked = Array.from(checks).filter(c => c.checked).length;
+  const pct = total > 0 ? Math.round(checked / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `준비 완료: ${checked}/${total}`;
+}
+
+// 시작
+init();
+</script>
+</body>
+</html>
