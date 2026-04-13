@@ -21,11 +21,28 @@ function now(): string {
   return new Date().toISOString().replace("T", " ").slice(0, 19);
 }
 
-// --- 저장소 ---
-const cases = new Map<string, Case>();
-const claims = new Map<string, Claim>();
-const properties = new Map<string, Property>();
-const evidences = new Map<string, Evidence>();
+// --- 저장소 (globalThis로 dev 핫리로드 시에도 유지) ---
+interface StoreData {
+  cases: Map<string, Case>;
+  claims: Map<string, Claim>;
+  properties: Map<string, Property>;
+  evidences: Map<string, Evidence>;
+}
+
+const globalStore = globalThis as unknown as { __insolvencyStore?: StoreData };
+if (!globalStore.__insolvencyStore) {
+  globalStore.__insolvencyStore = {
+    cases: new Map(),
+    claims: new Map(),
+    properties: new Map(),
+    evidences: new Map(),
+  };
+}
+
+const cases = globalStore.__insolvencyStore.cases;
+const claims = globalStore.__insolvencyStore.claims;
+const properties = globalStore.__insolvencyStore.properties;
+const evidences = globalStore.__insolvencyStore.evidences;
 
 // ===== Case =====
 export function createCase(data: CaseCreate): Case {
