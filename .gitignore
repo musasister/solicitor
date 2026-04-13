@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.env
+
+# Next.js
+.next/
+node_modules/
+out/
+next-env.d.ts
