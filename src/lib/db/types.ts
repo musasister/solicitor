@@ -164,3 +164,104 @@ export interface CaseSummary {
   totalClaimAmount: number;
   createdAt: string;
 }
+
+// ===== Threads 광고 리드 =====
+
+export interface UTMParams {
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  utmContent: string | null;
+  utmTerm: string | null;
+  utmId: string | null;
+  fbclid: string | null;
+}
+
+export interface Lead {
+  id: string;
+  name: string;
+  phone: string;
+  debtRange: string | null;
+  consultType: string;
+  memo: string | null;
+  utm: UTMParams;
+  status: string;      // 신규 | 상담중 | 완료 | 미전환
+  assignedTo: string | null;
+  caseId: string | null; // 연결된 사건 ID
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LeadCreate {
+  name: string;
+  phone: string;
+  debtRange?: string | null;
+  consultType?: string;
+  memo?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmContent?: string | null;
+  utmTerm?: string | null;
+  utmId?: string | null;
+  fbclid?: string | null;
+}
+
+export interface LeadUpdate {
+  status?: string;
+  assignedTo?: string | null;
+  caseId?: string | null;
+  note?: string | null;
+}
+
+export interface LeadSummary {
+  total: number;
+  byStatus: Record<string, number>;
+  bySource: Record<string, number>;
+  byConsultType: Record<string, number>;
+  todayCount: number;
+  weekCount: number;
+}
+
+// ===== 광고 캠페인 =====
+
+export interface AdCampaign {
+  id: string;
+  name: string;
+  platform: string;       // threads | instagram | facebook
+  metaCampaignId: string | null;
+  budget: number;
+  startDate: string;
+  endDate: string | null;
+  landingUrl: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  status: string;         // 활성 | 일시중지 | 종료
+  leads: number;
+  spent: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdCampaignCreate {
+  name: string;
+  platform: string;
+  metaCampaignId?: string | null;
+  budget?: number;
+  startDate: string;
+  endDate?: string | null;
+  landingUrl: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+}
+
+export interface AdCampaignUpdate {
+  name?: string;
+  budget?: number;
+  endDate?: string | null;
+  status?: string;
+  spent?: number;
+}

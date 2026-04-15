@@ -11,6 +11,8 @@ import type {
   Claim, ClaimCreate, ClaimUpdate,
   Property, PropertyCreate, PropertyUpdate,
   Evidence, EvidenceCreate,
+  Lead, LeadCreate, LeadUpdate, LeadSummary,
+  AdCampaign, AdCampaignCreate, AdCampaignUpdate,
 } from "./types";
 
 function genId(prefix: string): string {
@@ -27,6 +29,8 @@ interface StoreData {
   claims: Map<string, Claim>;
   properties: Map<string, Property>;
   evidences: Map<string, Evidence>;
+  leads: Map<string, Lead>;
+  campaigns: Map<string, AdCampaign>;
 }
 
 const globalStore = globalThis as unknown as { __insolvencyStore?: StoreData };
@@ -36,13 +40,24 @@ if (!globalStore.__insolvencyStore) {
     claims: new Map(),
     properties: new Map(),
     evidences: new Map(),
+    leads: new Map(),
+    campaigns: new Map(),
   };
+}
+// 기존 저장소에 leads/campaigns가 없으면 추가
+if (!globalStore.__insolvencyStore.leads) {
+  globalStore.__insolvencyStore.leads = new Map();
+}
+if (!globalStore.__insolvencyStore.campaigns) {
+  globalStore.__insolvencyStore.campaigns = new Map();
 }
 
 const cases = globalStore.__insolvencyStore.cases;
 const claims = globalStore.__insolvencyStore.claims;
 const properties = globalStore.__insolvencyStore.properties;
 const evidences = globalStore.__insolvencyStore.evidences;
+const leads = globalStore.__insolvencyStore.leads;
+const campaigns = globalStore.__insolvencyStore.campaigns;
 
 // ===== Case =====
 export function createCase(data: CaseCreate): Case {
@@ -286,4 +301,160 @@ export function listEvidencesByCase(caseId: string): Evidence[] {
 
 export function deleteEvidence(id: string): boolean {
   return evidences.delete(id);
+}
+
+// ===== Lead (Threads 광고 리드) =====
+export function createLead(data: LeadCreate): Lead {
+  const id = genId("lead");
+  const ts = now();
+  const lead: Lead = {
+    id,
+    name: data.name,
+    phone: data.phone,
+    debtRange: data.debtRange ?? null,
+    consultType: data.consultType ?? "개인회생",
+    memo: data.memo ?? null,
+    utm: {
+      utmSource: data.utmSource ?? null,
+      utmMedium: data.utmMedium ?? null,
+      utmCampaign: data.utmCampaign ?? null,
+      utmContent: data.utmContent ?? null,
+      utmTerm: data.utmTerm ?? null,
+      utmId: data.utmId ?? null,
+      fbclid: data.fbclid ?? null,
+    },
+    status: "신규",
+    assignedTo: null,
+    caseId: null,
+    note: null,
+    createdAt: ts,
+    updatedAt: ts,
+  };
+  leads.set(id, lead);
+
+  // 해당 캠페인의 리드 수 증가
+  if (data.utmCampaign) {
+    for (const c of campaigns.values()) {
+      if (c.utmCampaign === data.utmCampaign) {
+        campaigns.set(c.id, { ...c, leads: c.leads + 1, updatedAt: ts });
+        break;
+      }
+    }
+  }
+
+  return lead;
+}
+
+export function getLead(id: string): Lead | null {
+  return leads.get(id) ?? null;
+}
+
+export function listLeads(filter?: { status?: string; source?: string }): Lead[] {
+  const result: Lead[] = [];
+  for (const l of leads.values()) {
+    if (filter?.status && l.status !== filter.status) continue;
+    if (filter?.source && l.utm.utmSource !== filter.source) continue;
+    result.push(l);
+  }
+  return result.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function updateLead(id: string, data: LeadUpdate): Lead | null {
+  const l = leads.get(id);
+  if (!l) return null;
+  const updated: Lead = {
+    ...l,
+    ...(data.status !== undefined && { status: data.status }),
+    ...(data.assignedTo !== undefined && { assignedTo: data.assignedTo }),
+    ...(data.caseId !== undefined && { caseId: data.caseId }),
+    ...(data.note !== undefined && { note: data.note }),
+    updatedAt: now(),
+  };
+  leads.set(id, updated);
+  return updated;
+}
+
+export function deleteLead(id: string): boolean {
+  return leads.delete(id);
+}
+
+export function getLeadSummary(): LeadSummary {
+  const allLeads = listLeads();
+  const today = new Date().toISOString().slice(0, 10);
+  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().replace("T", " ").slice(0, 19);
+
+  const byStatus: Record<string, number> = {};
+  const bySource: Record<string, number> = {};
+  const byConsultType: Record<string, number> = {};
+  let todayCount = 0;
+  let weekCount = 0;
+
+  for (const l of allLeads) {
+    byStatus[l.status] = (byStatus[l.status] || 0) + 1;
+    const src = l.utm.utmSource || "direct";
+    bySource[src] = (bySource[src] || 0) + 1;
+    byConsultType[l.consultType] = (byConsultType[l.consultType] || 0) + 1;
+    if (l.createdAt.startsWith(today)) todayCount++;
+    if (l.createdAt >= weekAgo) weekCount++;
+  }
+
+  return { total: allLeads.length, byStatus, bySource, byConsultType, todayCount, weekCount };
+}
+
+// ===== AdCampaign (광고 캠페인) =====
+export function createCampaign(data: AdCampaignCreate): AdCampaign {
+  const id = genId("camp");
+  const ts = now();
+  const campaign: AdCampaign = {
+    id,
+    name: data.name,
+    platform: data.platform,
+    metaCampaignId: data.metaCampaignId ?? null,
+    budget: data.budget ?? 0,
+    startDate: data.startDate,
+    endDate: data.endDate ?? null,
+    landingUrl: data.landingUrl,
+    utmSource: data.utmSource ?? "th",
+    utmMedium: data.utmMedium ?? "paid",
+    utmCampaign: data.utmCampaign ?? id,
+    status: "활성",
+    leads: 0,
+    spent: 0,
+    createdAt: ts,
+    updatedAt: ts,
+  };
+  campaigns.set(id, campaign);
+  return campaign;
+}
+
+export function getCampaign(id: string): AdCampaign | null {
+  return campaigns.get(id) ?? null;
+}
+
+export function listCampaigns(): AdCampaign[] {
+  const result: AdCampaign[] = [];
+  for (const c of campaigns.values()) {
+    result.push(c);
+  }
+  return result.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function updateCampaign(id: string, data: AdCampaignUpdate): AdCampaign | null {
+  const c = campaigns.get(id);
+  if (!c) return null;
+  const updated: AdCampaign = {
+    ...c,
+    ...(data.name !== undefined && { name: data.name }),
+    ...(data.budget !== undefined && { budget: data.budget }),
+    ...(data.endDate !== undefined && { endDate: data.endDate }),
+    ...(data.status !== undefined && { status: data.status }),
+    ...(data.spent !== undefined && { spent: data.spent }),
+    updatedAt: now(),
+  };
+  campaigns.set(id, updated);
+  return updated;
+}
+
+export function deleteCampaign(id: string): boolean {
+  return campaigns.delete(id);
 }
