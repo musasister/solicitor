@@ -4,11 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import type { CaseSummary } from "@/lib/db/types";
 import CaseDetail from "@/components/CaseDetail";
 import CaseForm from "@/components/CaseForm";
+import VideoAdHero from "@/components/VideoAdHero";
+import AdLandingSection from "@/components/AdLandingSection";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseSummary[]>([]);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showLanding, setShowLanding] = useState(false);
 
   const loadCases = useCallback(async () => {
     const res = await fetch("/api/cases");
@@ -19,6 +22,22 @@ export default function Home() {
     loadCases();
   }, [loadCases]);
 
+  // Threads/Meta 광고를 통해 유입된 경우 랜딩페이지를 먼저 표시
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const utmSource = params.get("utm_source");
+    const fbclid = params.get("fbclid");
+    const showAd = params.get("ad");
+    if (utmSource === "th" || fbclid || showAd === "1") {
+      setShowLanding(true);
+    }
+  }, []);
+
+  const handleCtaClick = () => {
+    setShowLanding(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   if (selectedCaseId) {
     return (
       <CaseDetail
@@ -28,6 +47,15 @@ export default function Home() {
           loadCases();
         }}
       />
+    );
+  }
+
+  if (showLanding) {
+    return (
+      <div className="min-h-screen">
+        <VideoAdHero onCtaClick={handleCtaClick} />
+        <AdLandingSection onCtaClick={handleCtaClick} />
+      </div>
     );
   }
 
